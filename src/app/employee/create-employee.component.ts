@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-employee',
@@ -24,7 +24,7 @@ export class CreateEmployeeComponent implements OnInit {
     // });
 
     this.employeeForm = this._fb.group({
-      fullName : [''],
+      fullName : ['',[Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       email: [''],
 
       skills: this._fb.group({
