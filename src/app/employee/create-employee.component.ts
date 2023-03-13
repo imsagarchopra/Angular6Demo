@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-employee',
@@ -31,7 +31,8 @@ validationMessages: any = {
   },
 
   'email': {
-    'required': 'Email is required.'
+    'required': 'Email is required.',
+    'emailDomain': 'Email domain should be gmail.com'
   },
   'phone': {
     'required': 'Phone is required.'
@@ -64,7 +65,7 @@ validationMessages: any = {
     this.employeeForm = this._fb.group({
       fullName : ['',[Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactPreference: ['email'],
-      email: ['', Validators.required],
+      email: ['', [Validators.required, this.emailDomain]],
       phone:[''],
       skills: this._fb.group({
         skillName: ['', Validators.required],
@@ -143,5 +144,17 @@ validationMessages: any = {
     }
 
     phoneControl?.updateValueAndValidity();
+  }
+
+   emailDomain(control: AbstractControl): {[key: string]: any} | null{
+    const email: string = control.value;
+    const domain = email.substring(email.lastIndexOf('@')+1);
+
+    if(email === '' || domain .toLowerCase() == 'gmail.com'){
+      return null;
+    }
+    else{
+      return {'emailDomain': true};
+    }
   }
 }
