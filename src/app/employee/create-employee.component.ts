@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomValidators } from '../shared/custom.validators';
 
 @Component({
@@ -131,7 +131,7 @@ export class CreateEmployeeComponent implements OnInit {
            }
          }
        }
-       
+
       // If the control is nested form group, recursively call
       // this same method
       if (abstractControl instanceof FormGroup) {
@@ -142,8 +142,34 @@ export class CreateEmployeeComponent implements OnInit {
   }
 
   onLoadDataClick(): void {
-    this.logValidationErrors(this.employeeForm);
-    console.log(this.formErrors);
+    const formArray = new FormArray([
+      new FormControl('John', Validators.required),
+      new FormGroup({
+        country: new FormControl('', Validators.required)
+      }),
+      new FormArray([])
+    ]);
+
+    for(const control of formArray.controls){
+      if(control instanceof FormControl){
+        console.log('Control is FormControl');
+      }
+      if(control instanceof FormGroup){
+        console.log('Control is FormGroup');
+      }
+      if(control instanceof FormArray){
+        console.log('Control is FormArray');
+      }
+    }
+
+    //Other way to create form array using form builder
+    const formArray1 = this._fb.array([
+      new FormControl('John', Validators.required),
+      new FormControl('IT', Validators.required),
+      new FormControl('Male', Validators.required)
+    ]);
+
+    formArray1.push(new FormControl('Mark', Validators.required));
   }
 
   onContactPreferenceChange(selectedValue: string): void {
