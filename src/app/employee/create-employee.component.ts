@@ -16,6 +16,7 @@ export class CreateEmployeeComponent implements OnInit {
 formErrors: any = {
   'fullName': '',
   'email': '',
+  'phone':'',
   'skillName': '',
   'experienceInYears': '',
   'proficiency': ''
@@ -28,8 +29,12 @@ validationMessages: any = {
     'minlength': 'Full Name must be greater than 2 characters.',
     'maxlength': 'Full Name must be less than 10 characters.'
   },
+
   'email': {
     'required': 'Email is required.'
+  },
+  'phone': {
+    'required': 'Phone is required.'
   },
   'skillName': {
     'required': 'Skill Name is required.',
@@ -58,8 +63,9 @@ validationMessages: any = {
 
     this.employeeForm = this._fb.group({
       fullName : ['',[Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
-      email: [''],
-
+      contactPreference: ['email'],
+      email: ['', Validators.required],
+      phone:[''],
       skills: this._fb.group({
         skillName: ['', Validators.required],
         experienceInYears: ['', Validators.required],
@@ -124,5 +130,18 @@ validationMessages: any = {
   onLoadDataClick(): void {
     this.logValidationErrors(this.employeeForm);
     console.log(this.formErrors);
+  }
+
+  onContactPreferenceChange(selectedValue: string):void{
+    const phoneControl = this.employeeForm.get('phone');
+
+    if(selectedValue === 'phone'){
+      phoneControl?.setValidators(Validators.required);
+    }
+    else{
+      phoneControl?.clearValidators();
+    }
+
+    phoneControl?.updateValueAndValidity();
   }
 }
