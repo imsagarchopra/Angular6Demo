@@ -68,6 +68,9 @@ validationMessages: any = {
     });
 
     this.employeeForm.get('fullName')?.valueChanges.subscribe((value : string) => {this.fullNameLength = value.length} );
+    this.employeeForm.valueChanges.subscribe((data) => {
+      this.logValidationErrors(this.employeeForm);
+    });
   }
 
   onSubmit(): void{
@@ -86,7 +89,7 @@ validationMessages: any = {
   //   })
   // }
 
-  logValidationErrors(group: FormGroup): void {
+  logValidationErrors(group: FormGroup = this.employeeForm): void {
     // Loop through each control key in the FormGroup
     Object.keys(group.controls).forEach((key: string) => {
       // Get the control. The control can be a nested form group
@@ -99,7 +102,8 @@ validationMessages: any = {
       } else {
         // Clear the existing validation errors
         this.formErrors[key] = '';
-        if (abstractControl && !abstractControl.valid) {
+        if (abstractControl && !abstractControl.valid &&
+          (abstractControl.touched || abstractControl.dirty)) {
           // Get all the validation messages of the form control
           // that has failed the validation
           const messages = this.validationMessages[key];
