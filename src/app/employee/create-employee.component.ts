@@ -11,44 +11,44 @@ export class CreateEmployeeComponent implements OnInit {
   fullNameLength: number = 0;
 
   // This object will hold the messages to be displayed to the user
-// Notice, each key in this object has the same name as the
-// corresponding form control
-formErrors: any = {
-  'fullName': '',
-  'email': '',
-  'phone':'',
-  'skillName': '',
-  'experienceInYears': '',
-  'proficiency': ''
-};
+  // Notice, each key in this object has the same name as the
+  // corresponding form control
+  formErrors: any = {
+    'fullName': '',
+    'email': '',
+    'phone': '',
+    'skillName': '',
+    'experienceInYears': '',
+    'proficiency': ''
+  };
 
-// This object contains all the validation messages for this form
-validationMessages: any = {
-  'fullName': {
-    'required': 'Full Name is required.',
-    'minlength': 'Full Name must be greater than 2 characters.',
-    'maxlength': 'Full Name must be less than 10 characters.'
-  },
+  // This object contains all the validation messages for this form
+  validationMessages: any = {
+    'fullName': {
+      'required': 'Full Name is required.',
+      'minlength': 'Full Name must be greater than 2 characters.',
+      'maxlength': 'Full Name must be less than 10 characters.'
+    },
 
-  'email': {
-    'required': 'Email is required.',
-    'emailDomain': 'Email domain should be gmail.com'
-  },
-  'phone': {
-    'required': 'Phone is required.'
-  },
-  'skillName': {
-    'required': 'Skill Name is required.',
-  },
-  'experienceInYears': {
-    'required': 'Experience is required.',
-  },
-  'proficiency': {
-    'required': 'Proficiency is required.',
-  },
-};
+    'email': {
+      'required': 'Email is required.',
+      'emailDomain': 'Email domain should be gmail.com'
+    },
+    'phone': {
+      'required': 'Phone is required.'
+    },
+    'skillName': {
+      'required': 'Skill Name is required.',
+    },
+    'experienceInYears': {
+      'required': 'Experience is required.',
+    },
+    'proficiency': {
+      'required': 'Proficiency is required.',
+    },
+  };
 
-  constructor(private _fb:FormBuilder){ }
+  constructor(private _fb: FormBuilder) { }
 
   ngOnInit(): void {
     // this.employeeForm = new FormGroup({
@@ -63,10 +63,10 @@ validationMessages: any = {
     // });
 
     this.employeeForm = this._fb.group({
-      fullName : ['',[Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
+      fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactPreference: ['email'],
-      email: ['', [Validators.required, this.emailDomain]],
-      phone:[''],
+      email: ['', [Validators.required, this.emailDomain('gmail.com')]],
+      phone: [''],
       skills: this._fb.group({
         skillName: ['', Validators.required],
         experienceInYears: ['', Validators.required],
@@ -74,13 +74,13 @@ validationMessages: any = {
       })
     });
 
-    this.employeeForm.get('fullName')?.valueChanges.subscribe((value : string) => {this.fullNameLength = value.length} );
+    this.employeeForm.get('fullName')?.valueChanges.subscribe((value: string) => { this.fullNameLength = value.length });
     this.employeeForm.valueChanges.subscribe((data) => {
       this.logValidationErrors(this.employeeForm);
     });
   }
 
-  onSubmit(): void{
+  onSubmit(): void {
     console.log(this.employeeForm.value);
   }
 
@@ -127,34 +127,36 @@ validationMessages: any = {
       }
     });
   }
-  
+
   onLoadDataClick(): void {
     this.logValidationErrors(this.employeeForm);
     console.log(this.formErrors);
   }
 
-  onContactPreferenceChange(selectedValue: string):void{
+  onContactPreferenceChange(selectedValue: string): void {
     const phoneControl = this.employeeForm.get('phone');
 
-    if(selectedValue === 'phone'){
+    if (selectedValue === 'phone') {
       phoneControl?.setValidators(Validators.required);
     }
-    else{
+    else {
       phoneControl?.clearValidators();
     }
 
     phoneControl?.updateValueAndValidity();
   }
 
-   emailDomain(control: AbstractControl): {[key: string]: any} | null{
-    const email: string = control.value;
-    const domain = email.substring(email.lastIndexOf('@')+1);
+  emailDomain(domainName: string) {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const email: string = control.value;
+      const domain = email.substring(email.lastIndexOf('@') + 1);
 
-    if(email === '' || domain .toLowerCase() == 'gmail.com'){
-      return null;
-    }
-    else{
-      return {'emailDomain': true};
-    }
+      if (email === '' || domain.toLowerCase() == domainName.toLowerCase()) {
+        return null;
+      }
+      else {
+        return { 'emailDomain': true };
+      }
+    };
   }
 }
