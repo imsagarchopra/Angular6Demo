@@ -14,4 +14,16 @@ export class CustomValidators {
             }
         };
     }
+
+    static matchEmail(group: AbstractControl): { [key: string]: any } | null {
+        const emailControl = group.get('email');
+        const confirmEmailControl = group.get('confirmEmail');
+
+        if (emailControl === confirmEmailControl || confirmEmailControl?.pristine) {
+            return null;
+        }
+        else {
+            return { 'emailMismatch': true };
+        }
+    };
 }

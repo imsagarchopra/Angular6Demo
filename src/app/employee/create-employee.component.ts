@@ -16,7 +16,9 @@ export class CreateEmployeeComponent implements OnInit {
   // corresponding form control
   formErrors: any = {
     'fullName': '',
+    'emailGroup': '',
     'email': '',
+    'confirmEmail': '',
     'phone': '',
     'skillName': '',
     'experienceInYears': '',
@@ -30,10 +32,15 @@ export class CreateEmployeeComponent implements OnInit {
       'minlength': 'Full Name must be greater than 2 characters.',
       'maxlength': 'Full Name must be less than 10 characters.'
     },
-
+    'emailGroup':{
+      'emailMismatch': 'Email and Confirm Email do not match'
+    },
     'email': {
       'required': 'Email is required.',
       'emailDomain': 'Email domain should be gmail.com'
+    },
+    'confirmEmail': {
+      'required': 'Confirm Email is required.',
     },
     'phone': {
       'required': 'Phone is required.'
@@ -66,7 +73,11 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm = this._fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       contactPreference: ['email'],
-      email: ['', [Validators.required, CustomValidators.emailDomain('gmail.com')]],
+
+      emailGroup: this._fb.group({
+        email: ['', [Validators.required, CustomValidators.emailDomain('gmail.com')]],
+        confirmEmail:['', Validators.required]
+      },{validator: CustomValidators.matchEmail}),
       phone: [''],
       skills: this._fb.group({
         skillName: ['', Validators.required],
@@ -102,30 +113,31 @@ export class CreateEmployeeComponent implements OnInit {
     Object.keys(group.controls).forEach((key: string) => {
       // Get the control. The control can be a nested form group
       const abstractControl = group.get(key);
+
+       // Clear the existing validation errors
+       this.formErrors[key] = '';
+       if (abstractControl && !abstractControl.valid &&
+         (abstractControl.touched || abstractControl.dirty)) {
+         // Get all the validation messages of the form control
+         // that has failed the validation
+         const messages = this.validationMessages[key];
+         // Find which validation has failed. For example required,
+         // minlength or maxlength. Store that error message in the
+         // formErrors object. The UI will bind to this object to
+         // display the validation errors
+         for (const errorKey in abstractControl.errors) {
+           if (errorKey) {
+             this.formErrors[key] += messages[errorKey] + ' ';
+           }
+         }
+       }
+       
       // If the control is nested form group, recursively call
       // this same method
       if (abstractControl instanceof FormGroup) {
         this.logValidationErrors(abstractControl);
         // If the control is a FormControl
-      } else {
-        // Clear the existing validation errors
-        this.formErrors[key] = '';
-        if (abstractControl && !abstractControl.valid &&
-          (abstractControl.touched || abstractControl.dirty)) {
-          // Get all the validation messages of the form control
-          // that has failed the validation
-          const messages = this.validationMessages[key];
-          // Find which validation has failed. For example required,
-          // minlength or maxlength. Store that error message in the
-          // formErrors object. The UI will bind to this object to
-          // display the validation errors
-          for (const errorKey in abstractControl.errors) {
-            if (errorKey) {
-              this.formErrors[key] += messages[errorKey] + ' ';
-            }
-          }
-        }
-      }
+      } 
     });
   }
 
