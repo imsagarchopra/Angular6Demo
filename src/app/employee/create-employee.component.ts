@@ -15,6 +15,7 @@ export class CreateEmployeeComponent implements OnInit {
   employeeForm !: FormGroup;
   fullNameLength: number = 0;
   employee!: IEmployee;
+  pageTitle!: string;
 
   // This object will hold the messages to be displayed to the user
   // Notice, each key in this object has the same name as the
@@ -101,9 +102,11 @@ export class CreateEmployeeComponent implements OnInit {
       const empId = <number><unknown>params.get('id');
 
       if(empId){
+        this.pageTitle = 'Edit Employee';
         this.getEmployee(empId);
       }
       else{
+        this.pageTitle = 'Create Employee';
         this.employee = {
           id:0,
           fullName: '',
