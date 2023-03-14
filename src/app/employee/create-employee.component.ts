@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { CustomValidators } from '../shared/custom.validators';
 import { EmployeeService } from './employee.service';
 import { IEmployee } from './IEmployee';
@@ -14,6 +14,7 @@ import { ISkill } from './ISkill';
 export class CreateEmployeeComponent implements OnInit {
   employeeForm !: FormGroup;
   fullNameLength: number = 0;
+  employee!: IEmployee;
 
   // This object will hold the messages to be displayed to the user
   // Notice, each key in this object has the same name as the
@@ -62,7 +63,8 @@ export class CreateEmployeeComponent implements OnInit {
 
   constructor(private _fb: FormBuilder,
     private route: ActivatedRoute,
-    private employeeService: EmployeeService) { }
+    private employeeService: EmployeeService,
+    private router: Router) { }
 
   ngOnInit(): void {
     // this.employeeForm = new FormGroup({
@@ -106,7 +108,11 @@ export class CreateEmployeeComponent implements OnInit {
 
   getEmployee(id: number):void{
     this.employeeService.getEmployee(id).subscribe(
-      (employee : IEmployee) => this.editEmployee(employee),(err: any) => console.log(err)
+      (employee : IEmployee) =>{
+        this.editEmployee(employee);
+        this.employee = employee;       
+      },
+      (err: any) => console.log(err)
     );
   }
 
@@ -143,9 +149,20 @@ export class CreateEmployeeComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.employeeForm.value);
+    this.mapFormValuesToEmployeeModel();
+    this.employeeService.updateEmployee(this.employee).subscribe(
+      () => this.router.navigate(['list']),
+      (err: any) => console.log(err)     
+    );
   }
 
+  mapFormValuesToEmployeeModel(){
+    this.employee.fullName = this.employeeForm.value.fullName;
+    this.employee.contactPreference = this.employeeForm.value.contactPreference;
+    this.employee.email = this.employeeForm.value.email;
+    this.employee.phone = this.employeeForm.value.phone;
+    this.employee.skills = this.employeeForm.value.skills;
+  }
   // onLoadDataClick(): void{
   //   this.employeeForm.setValue({
   //     fullName: 'John',
