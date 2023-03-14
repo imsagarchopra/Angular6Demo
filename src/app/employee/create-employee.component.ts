@@ -204,4 +204,8 @@ export class CreateEmployeeComponent implements OnInit {
       proficiency: ['beginner', Validators.required]
     })
   }
+
+  removeSkillButtonClick(skillGroupIndex : number): void{
+    (<FormArray>this.employeeForm.get('skills')).removeAt(skillGroupIndex);
+  }
 }
