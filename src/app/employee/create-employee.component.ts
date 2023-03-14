@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CustomValidators } from '../shared/custom.validators';
+import { EmployeeService } from './employee.service';
+import { IEmployee } from './IEmployee';
 
 @Component({
   selector: 'app-create-employee',
@@ -56,7 +59,9 @@ export class CreateEmployeeComponent implements OnInit {
     },
   };
 
-  constructor(private _fb: FormBuilder) { }
+  constructor(private _fb: FormBuilder,
+    private route: ActivatedRoute,
+    private employeeService: EmployeeService) { }
 
   ngOnInit(): void {
     // this.employeeForm = new FormGroup({
@@ -87,6 +92,32 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm.get('fullName')?.valueChanges.subscribe((value: string) => { this.fullNameLength = value.length });
     this.employeeForm.valueChanges.subscribe((data) => {
       this.logValidationErrors(this.employeeForm);
+    });
+
+    this.route.paramMap.subscribe(params => {
+      const empId = <number><unknown>params.get('id');
+
+      if(empId){
+        this.getEmployee(empId);
+      }
+    });
+  }
+
+  getEmployee(id: number):void{
+    this.employeeService.getEmployee(id).subscribe(
+      (employee : IEmployee) => this.editEmployee(employee),(err: any) => console.log(err)
+    );
+  }
+
+  editEmployee(employee : IEmployee): void{
+    this.employeeForm.patchValue({
+      fullName: employee.fullName,
+      contactPreference: employee.contactPreference,
+      emailGroup:{
+        email: employee.email,
+        confirmEmail: employee.email
+      },
+      phone: employee.phone
     });
   }
 
@@ -119,7 +150,7 @@ export class CreateEmployeeComponent implements OnInit {
        // Clear the existing validation errors
        this.formErrors[key] = '';
        if (abstractControl && !abstractControl.valid &&
-         (abstractControl.touched || abstractControl.dirty)) {
+         (abstractControl.touched || abstractControl.dirty || abstractControl.value !== '' )) {
          // Get all the validation messages of the form control
          // that has failed the validation
          const messages = this.validationMessages[key];

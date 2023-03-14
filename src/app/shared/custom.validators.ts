@@ -19,7 +19,7 @@ export class CustomValidators {
         const emailControl = group.get('email');
         const confirmEmailControl = group.get('confirmEmail');
 
-        if (emailControl === confirmEmailControl || confirmEmailControl?.pristine) {
+        if (emailControl === confirmEmailControl || (confirmEmailControl?.pristine && confirmEmailControl.value === '')) {
             return null;
         }
         else {
