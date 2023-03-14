@@ -103,6 +103,18 @@ export class CreateEmployeeComponent implements OnInit {
       if(empId){
         this.getEmployee(empId);
       }
+      else{
+        this.employee = {
+          id:0,
+          fullName: '',
+          contactPreference: '',
+          email: '',
+          phone: undefined,
+          skills:[]
+
+
+        };
+      }
     });
   }
 
@@ -150,10 +162,21 @@ export class CreateEmployeeComponent implements OnInit {
 
   onSubmit(): void {
     this.mapFormValuesToEmployeeModel();
-    this.employeeService.updateEmployee(this.employee).subscribe(
-      () => this.router.navigate(['list']),
-      (err: any) => console.log(err)     
-    );
+
+    if(this.employee.id !== 0)
+    {
+      this.employeeService.updateEmployee(this.employee).subscribe(
+        () => this.router.navigate(['list']),
+        (err: any) => console.log(err)     
+      );
+    }
+    else{
+      this.employeeService.addEmployee(this.employee).subscribe(
+        () => this.router.navigate(['list']),
+        (err: any) => console.log(err)     
+      );
+    }
+    
   }
 
   mapFormValuesToEmployeeModel(){
